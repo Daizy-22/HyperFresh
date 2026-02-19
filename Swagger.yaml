@@ -1,0 +1,346 @@
+openapi: 3.0.0
+info:
+  title: HyperFresh API
+  description: API démonstrative pour l'application anti-gaspillage HyperFresh
+  version: 1.0.0
+servers:
+- url: https://api.hyperfresh.com/v1
+paths:
+  /users/register:
+    post:
+      summary: Créer un compte étudiant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/users_register_body"
+        required: true
+      responses:
+        "200":
+          description: Compte créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200"
+        "400":
+          description: Email déjà existant
+        "422":
+          description: Données invalides
+  /users/login:
+    post:
+      summary: Connexion utilisateur
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/users_login_body"
+        required: true
+      responses:
+        "200":
+          description: Connexion réussie
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_1"
+        "401":
+          description: Identifiants invalides
+  /users/{id}:
+    get:
+      summary: Récupérer profil utilisateur
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Profil utilisateur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_2"
+        "404":
+          description: Utilisateur non trouvé
+  /products:
+    get:
+      summary: Lister produits disponibles
+      parameters:
+      - name: categorie
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: filtre_stock
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: filtre_dlc
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Liste des produits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inline_response_200_3"
+        "404":
+          description: Aucun produit trouvé
+  /products/{id}:
+    get:
+      summary: Détails d’un produit
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Détails du produit
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_4"
+        "404":
+          description: Produit non trouvé
+  /orders:
+    post:
+      summary: Créer une commande
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/orders_body"
+        required: true
+      responses:
+        "200":
+          description: Commande créée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_5"
+        "400":
+          description: Produits invalides
+        "422":
+          description: Quantité non disponible
+  /orders/{id}:
+    get:
+      summary: Détails d’une commande
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Détails de la commande
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_6"
+        "404":
+          description: Commande non trouvée
+  /reco/{id_user}:
+    get:
+      summary: Obtenir recommandations produits
+      parameters:
+      - name: id_user
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Liste recommandations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inline_response_200_7"
+        "404":
+          description: Utilisateur non trouvé
+  /points/{id_user}:
+    get:
+      summary: Voir points et badges utilisateur
+      parameters:
+      - name: id_user
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Points et badges
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_8"
+        "404":
+          description: Utilisateur non trouvé
+components:
+  schemas:
+    users_register_body:
+      type: object
+      properties:
+        nom:
+          type: string
+        prenom:
+          type: string
+        email:
+          type: string
+        mot_de_passe:
+          type: string
+        date_naissance:
+          type: string
+          format: date
+        preferences:
+          type: string
+    inline_response_200:
+      type: object
+      properties:
+        id_user:
+          type: integer
+        message:
+          type: string
+    users_login_body:
+      type: object
+      properties:
+        email:
+          type: string
+        mot_de_passe:
+          type: string
+    inline_response_200_1:
+      type: object
+      properties:
+        token:
+          type: string
+        id_user:
+          type: integer
+    inline_response_200_2:
+      type: object
+      properties:
+        nom:
+          type: string
+        prenom:
+          type: string
+        email:
+          type: string
+        date_naissance:
+          type: string
+          format: date
+        preferences:
+          type: string
+        points:
+          type: integer
+        badges:
+          type: array
+          items:
+            type: string
+    inline_response_200_3:
+      type: object
+      properties:
+        id_product:
+          type: integer
+        nom:
+          type: string
+        prix:
+          type: number
+        stock:
+          type: integer
+        dlc:
+          type: string
+          format: date
+        image_url:
+          type: string
+    inline_response_200_4:
+      type: object
+      properties:
+        id_product:
+          type: integer
+        nom:
+          type: string
+        prix:
+          type: number
+        stock:
+          type: integer
+        dlc:
+          type: string
+          format: date
+        categorie:
+          type: string
+        image_url:
+          type: string
+    orders_liste_produits:
+      type: object
+      properties:
+        id_product:
+          type: integer
+        quantite:
+          type: integer
+    orders_body:
+      type: object
+      properties:
+        id_user:
+          type: integer
+        liste_produits:
+          type: array
+          items:
+            $ref: "#/components/schemas/orders_liste_produits"
+    inline_response_200_5:
+      type: object
+      properties:
+        id_order:
+          type: integer
+        total:
+          type: number
+        statut:
+          type: string
+    inline_response_200_6:
+      type: object
+      properties:
+        id_order:
+          type: integer
+        id_user:
+          type: integer
+        produits:
+          type: array
+          items:
+            type: object
+            properties:
+              id_product:
+                type: integer
+              quantite:
+                type: integer
+              prix_unitaire:
+                type: number
+        total:
+          type: number
+        statut:
+          type: string
+    inline_response_200_7:
+      type: object
+      properties:
+        id_product:
+          type: integer
+        nom:
+          type: string
+        score_reco:
+          type: number
+    inline_response_200_8:
+      type: object
+      properties:
+        points:
+          type: integer
+        badges:
+          type: array
+          items:
+            type: string
